@@ -3,11 +3,13 @@
 
 void ClearScreen();
 void DisplayDataSizes();
+void DisplayCard(HANDLE hStdOut, COORD currentCoOrds);
+void DisplayBoard();
 
 int main()
 {
     char response;
-    DisplayCard();
+    DisplayBoard();
     std::cin >> response;
     return 0;
 }
@@ -68,6 +70,7 @@ void ClearScreen()
     SetConsoleCursorPosition( hStdOut, homeCoords );
 }
 
+// Use to display all the current cards on the board (3x3 grid)
 void DisplayBoard()
 {
     HANDLE              hStdOut;
@@ -76,22 +79,34 @@ void DisplayBoard()
     hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
     if (hStdOut == INVALID_HANDLE_VALUE) return;
 
+    short cardWidth = 14;
+    short cardHeight = 8;
 
+    for(int i = 0; i < 3; i += 1) {
+        for(int j =0; j < 3; j += 1) {
+            DisplayCard(hStdOut, currentCoOrds);
+            currentCoOrds = {currentCoOrds.X + cardWidth, currentCoOrds.Y};
+        }
+        currentCoOrds = {0, currentCoOrds.Y + cardHeight};
+    }
+
+    std::cout << std::endl;
 }
 
+// Use to display each individual card
 void DisplayCard(HANDLE hStdOut, COORD currentCoOrds)
 {
-    int currentColumn = currentCoOrds.Y + 2;
-    int currentRow = currentCoOrds.X + 2;
+    short currentColumn = currentCoOrds.X;
+    short currentRow = currentCoOrds.Y;
 
     SetConsoleCursorPosition(hStdOut, currentCoOrds);
-    for(int i = 0; i < 7; i += 1) {
-        std::cout << "*";
+    std::cout << "*-----------*";
+    for(int i = 0; i < 6; i += 1) {
+        currentRow += 1;
+        SetConsoleCursorPosition(hStdOut, {currentColumn, currentRow});
+        std::cout << "|           |";
     }
-
-    currentCoOrds = {currentColumn, currentRow};
-    SetConsoleCursorPosition(hStdOut, currentCoOrds);
-    for(int i = 0; i < 7; i += 1) {
-        std::cout << "*";
-    }
+    currentRow += 1;
+    SetConsoleCursorPosition(hStdOut, {currentColumn, currentRow});
+    std::cout << "*-----------*";
 }
